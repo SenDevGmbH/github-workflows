@@ -1,0 +1,60 @@
+name: Publish to NuGet
+
+on:
+  workflow_call:
+    inputs:
+      solution-path:
+        description: 'Path to the solution file'
+        required: true
+        type: string
+      test-project-path:
+        description: 'Path to the test project (leave empty to skip tests)'
+        required: false
+        type: string
+        default: ''
+      package-name-pattern:
+        description: 'Base NuGet package name used to locate .nupkg files, e.g. "Acme.MyLibrary"'
+        required: true
+        type: string
+      dotnet-version:
+        description: '.NET SDK version to install'
+        required: false
+        type: string
+        default: '9.0.x'
+    secrets: inherit
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout calling repository
+      uses: actions/checkout@v4
+
+    - name: Checkout shared build scripts
+      uses: actions/checkout@v4
+      with:
+        repository: SenDev/GithubWorkflows
+        path: .cake-scripts
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Build and Publish
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: .cake-scripts/build.cake
+        target: Push
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+          solutionPath: ${{ inputs.solution-path }}
+          testProjectPath: ${{ inputs.test-project-path }}
+          dxVersions: ${{ vars.DX_VERSIONS }}
+          packageNamePattern: ${{ inputs.package-name-pattern }}
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        AZURE_NUGET_KEY: ${{ secrets.AZURE_NUGET_KEY }}
+        AZURE_NUGET_SOURCE: ${{ secrets.AZURE_NUGET_SOURCE }}
+        NUGET_SOURCE: https://api.nuget.org/v3/index.json
