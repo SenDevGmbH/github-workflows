@@ -40,7 +40,7 @@ jobs:
     - name: Checkout shared build scripts
       uses: actions/checkout@v4
       with:
-        repository: SenDev/github-workflows
+        repository: SenDevGmbH/github-workflows
         path: .cake-scripts
 
     - name: Setup .NET
