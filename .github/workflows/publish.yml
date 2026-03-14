@@ -21,7 +21,13 @@ on:
         required: false
         type: string
         default: '9.0.x'
-    secrets: inherit
+    secrets:
+      NUGET_API_KEY:
+        required: true
+      AZURE_NUGET_KEY:
+        required: false
+      AZURE_NUGET_SOURCE:
+        required: false
 
 jobs:
   build-and-publish:
