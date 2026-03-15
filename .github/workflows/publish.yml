@@ -35,16 +35,16 @@ jobs:
 
     steps:
     - name: Checkout calling repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Checkout shared build scripts
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: SenDevGmbH/github-workflows
         path: .cake-scripts
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ inputs.dotnet-version }}
 
