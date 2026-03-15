@@ -59,6 +59,7 @@ jobs:
           testProjectPath: ${{ inputs.test-project-path }}
           dxVersions: ${{ vars.DX_VERSIONS }}
           packageNamePattern: ${{ inputs.package-name-pattern }}
+          currentDirectory: ${{ github.workspace }}
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         AZURE_NUGET_KEY: ${{ secrets.AZURE_NUGET_KEY }}

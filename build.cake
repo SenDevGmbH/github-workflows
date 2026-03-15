@@ -1,3 +1,5 @@
+using Microsoft.VisualBasic;
+
 var target = Argument("target", "Pack");
 var buildNumber = Argument("buildNumber", "1");
 var configuration = Argument("configuration", "Release");
@@ -5,6 +7,10 @@ var solutionPath = Argument("solutionPath", "");
 var testProjectPath = Argument("testProjectPath", "");
 var dxVersionsArg = Argument("dxVersions", "");
 var packageNamePattern = Argument("packageNamePattern", "");
+var currentDirectory = Argument("currentDirectory", "");
+
+if (!string.IsNullOrWhiteSpace(currentDirectory))
+    System.IO.Directory.SetCurrentDirectory(currentDirectory);
 
 var nugetApiKey = EnvironmentVariable("NUGET_API_KEY");
 var nugetSource = EnvironmentVariable("NUGET_SOURCE") ?? "https://api.nuget.org/v3/index.json";
@@ -77,6 +83,8 @@ Task("Pack")
 Task("Test")
     .Does(() =>
 {
+
+    Information("Current Directory: " + System.IO.Directory.GetCurrentDirectory());   
     if (string.IsNullOrWhiteSpace(testProjectPath))
     {
         Information("No test project specified, skipping tests.");
@@ -86,8 +94,6 @@ Task("Test")
     DotNetTest(testProjectPath, new DotNetTestSettings
     {
         Configuration = configuration,
-        NoBuild = true,
-        NoRestore = true,
     });
 });
 
