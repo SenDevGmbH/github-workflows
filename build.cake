@@ -54,7 +54,7 @@ Task("Pack")
             DotNetRestore(solutionPath, new DotNetRestoreSettings
             {
                 MSBuildSettings = msBuildSettings,
-                Sources = new[] { azureSource }
+                Sources = new[] { GetNugetSource(version) }
             });
         }
         finally
@@ -135,6 +135,18 @@ Task("Push")
 });
 
 RunTarget(target);
+
+
+string GetNugetSource(string version) 
+{
+    return ShouldUsePrivateFeed(version) ? azureSource : nugetSource;
+}
+
+bool ShouldUsePrivateFeed(string version)
+{
+    var versionSegments = version.Split('.');
+    return versionSegments.Length == 4;
+}
 
 string CalculatePackageVersion(string version)
 {
