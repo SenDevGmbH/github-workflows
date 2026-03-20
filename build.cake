@@ -107,11 +107,12 @@ Task("Push")
         Information($"Processing Push for DevExpress Version: {version}");
 
         var packageVersion = CalculatePackageVersion(version);
-        var packagePath = $"{artifactsDir}/{packageNamePattern}.{packageVersion}.nupkg";
+        var globPattern = $"{artifactsDir}/{packageNamePattern}.{packageVersion}.nupkg";
+        var packages = GetFiles(globPattern);
 
-        if (!FileExists(packagePath))
+        if (!packages.Any())
         {
-            Warning($"Package not found: {packagePath}");
+            Warning($"No packages found matching: {globPattern}");
             continue;
         }
 
@@ -123,14 +124,17 @@ Task("Push")
             continue;
         }
 
-        Information($"Pushing {packagePath} to {nugetSettings.Source}...");
         CreateAuthenticatedNugetConfig();
-        DotNetNuGetPush(packagePath, new DotNetNuGetPushSettings
+        foreach (var packagePath in packages)
         {
-            Source = nugetSettings.Source,
-            ApiKey = nugetSettings.ApiKey,
-            SkipDuplicate = true
-        });
+            Information($"Pushing {packagePath} to {nugetSettings.Source}...");
+            DotNetNuGetPush(packagePath.ToString(), new DotNetNuGetPushSettings
+            {
+                Source = nugetSettings.Source,
+                ApiKey = nugetSettings.ApiKey,
+                SkipDuplicate = true
+            });
+        }
     }
 });
 
