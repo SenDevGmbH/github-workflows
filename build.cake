@@ -47,6 +47,7 @@ Task("Pack")
         var msBuildSettings = new DotNetMSBuildSettings()
             .WithProperty("DevExpressPackageVersion", version)
             .WithProperty("PackageVersion", packageVersion);
+            .WithProperty("AssemblyVersion", packageVersion);
 
         CreateAuthenticatedNugetConfig();
         try
