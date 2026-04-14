@@ -8,7 +8,7 @@ This repository provides reusable GitHub Actions workflows and a [Cake](https://
 
 ## Contents
 
-- **`build.cake`** — Cake build script that handles cleaning, packing, testing, and pushing NuGet packages.
+- **`build.cs`** — Cake.Sdk build script (file-based C# app) that handles cleaning, packing, testing, and pushing NuGet packages.
 - **`.github/workflows/publish.yml`** — Reusable GitHub Actions workflow for publishing packages to NuGet.
 
 ## Usage

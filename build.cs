@@ -1,6 +1,4 @@
-#:sdk Cake.Sdk
-
-using Microsoft.VisualBasic;
+#:sdk Cake.Sdk@6.1.1
 
 var target = Argument("target", "Pack");
 var buildNumber = Argument("buildNumber", "1");
@@ -88,7 +86,7 @@ Task("Test")
     .Does(() =>
 {
 
-    Information("Current Directory: " + System.IO.Directory.GetCurrentDirectory());   
+    Information("Current Directory: " + System.IO.Directory.GetCurrentDirectory());
     if (string.IsNullOrWhiteSpace(testProjectPath))
     {
         Information("No test project specified, skipping tests.");
@@ -144,7 +142,7 @@ Task("Push")
 RunTarget(target);
 
 
-string GetNugetSource(string version) 
+string GetNugetSource(string version)
 {
     return ShouldUsePrivateFeed(version) ? azureSource : nugetSource;
 }

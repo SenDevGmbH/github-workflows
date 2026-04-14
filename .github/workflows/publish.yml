@@ -49,17 +49,16 @@ jobs:
         dotnet-version: ${{ inputs.dotnet-version }}
 
     - name: Build and Publish
-      uses: cake-build/cake-action@v3
-      with:
-        script-path: .cake-scripts/build.cake
-        target: Push
-        arguments: |
-          buildNumber: ${{ github.run_number }}
-          solutionPath: ${{ inputs.solution-path }}
-          testProjectPath: ${{ inputs.test-project-path }}
-          dxVersions: ${{ vars.DX_VERSIONS }}
-          packageNamePattern: ${{ inputs.package-name-pattern }}
-          currentDirectory: ${{ github.workspace }}
+      working-directory: .cake-scripts
+      run: >-
+        dotnet run build.cs --
+        --target=Push
+        --buildNumber=${{ github.run_number }}
+        --solutionPath=${{ inputs.solution-path }}
+        --testProjectPath=${{ inputs.test-project-path }}
+        --dxVersions=${{ vars.DX_VERSIONS }}
+        --packageNamePattern=${{ inputs.package-name-pattern }}
+        --currentDirectory=${{ github.workspace }}
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         AZURE_NUGET_KEY: ${{ secrets.AZURE_NUGET_KEY }}
