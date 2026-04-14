@@ -162,7 +162,10 @@ bool ShouldUsePrivateFeed(string version)
 PackageVersionInfo CalculatePackageVersion(string versionString)
 {
     var version = Version.Parse(versionString);
-    return  new PackageVersionInfo(new Version(version.Major, version.Minor, version.Build, int.Parse(buildNumber)).ToString(), version.MinorRevision == 0 ? string.Empty : privatePackageSuffix);
+    var suffix = ShouldUsePrivateFeed(versionString) ? privatePackageSuffix : string.Empty;
+    return new PackageVersionInfo(
+        new Version(version.Major, version.Minor, version.Build, int.Parse(buildNumber)).ToString(),
+        suffix);
 }
 
 (string Source, string ApiKey) GetNuGetSettings(string version)
