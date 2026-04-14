@@ -1,5 +1,7 @@
 #:sdk Cake.Sdk@6.1.1
 
+
+const string privatePackageSuffix  = ".SelfCompiled";    
 var target = Argument("target", "Pack");
 var buildNumber = Argument("buildNumber", "1");
 var configuration = Argument("configuration", "Release");
@@ -41,14 +43,17 @@ Task("Pack")
     {
         Information($"Processing package version: {version}");
 
+        var packageVersionInfo = CalculatePackageVersion(version);
+        var packageVersion = packageVersionInfo.Version;
+        Information($"Calculated Package Version: {packageVersion}");
 
         var msBuildSettings = new DotNetMSBuildSettings()
             .WithProperty("DevExpressPackageVersion", version)
-            .WithProperty("PackageVersion", version)
-            .WithProperty("AssemblyVersion", version);
+            .WithProperty("PackageVersion", packageVersion)
+            .WithProperty("AssemblyVersion", packageVersion);
 
         if (ShouldUsePrivateFeed(version))
-            msBuildSettings = msBuildSettings.WithProperty("PackageIdSuffix", ".SelfCompiled");
+            msBuildSettings = msBuildSettings.WithProperty("PackageIdSuffix", privatePackageSuffix);
 
         CreateAuthenticatedNugetConfig();
         try
@@ -108,7 +113,8 @@ Task("Push")
     {
         Information($"Processing Push for DevExpress Version: {version}");
 
-        var globPattern = $"{artifactsDir}/*.nupkg";
+        var packageVersionInfo = CalculatePackageVersion(version);
+        var globPattern = $"{artifactsDir}/{packageNamePattern}{packageVersionInfo.Suffix}.{packageVersionInfo.Version}.nupkg";
         var packages = GetFiles(globPattern);
 
         if (!packages.Any())
@@ -153,6 +159,11 @@ bool ShouldUsePrivateFeed(string version)
     return versionSegments.Length == 4;
 }
 
+PackageVersionInfo CalculatePackageVersion(string versionString)
+{
+    var version = Version.Parse(versionString);
+    return  new PackageVersionInfo(new Version(version.Major, version.Minor, version.Build, int.Parse(buildNumber)).ToString(), version.MinorRevision == 0 ? string.Empty : privatePackageSuffix);
+}
 
 (string Source, string ApiKey) GetNuGetSettings(string version)
 {
@@ -176,3 +187,5 @@ void CreateAuthenticatedNugetConfig()
             .Append("--store-password-in-clear-text")
     });
 }
+
+record PackageVersionInfo(string Version, string Suffix);
