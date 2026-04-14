@@ -1,3 +1,5 @@
+#:sdk Cake.Sdk
+
 using Microsoft.VisualBasic;
 
 var target = Argument("target", "Pack");
@@ -39,15 +41,16 @@ Task("Pack")
 {
     foreach (var version in devExpressVersions)
     {
-        Information($"Processing DevExpress Version: {version}");
+        Information($"Processing package version: {version}");
 
-        var packageVersion = CalculatePackageVersion(version);
-        Information($"Calculated Package Version: {packageVersion}");
 
         var msBuildSettings = new DotNetMSBuildSettings()
             .WithProperty("DevExpressPackageVersion", version)
-            .WithProperty("PackageVersion", packageVersion)
-            .WithProperty("AssemblyVersion", packageVersion);
+            .WithProperty("PackageVersion", version)
+            .WithProperty("AssemblyVersion", version);
+
+        if (ShouldUsePrivateFeed(version))
+            msBuildSettings = msBuildSettings.WithProperty("PackageIdSuffix", ".SelfCompiled");
 
         CreateAuthenticatedNugetConfig();
         try
@@ -107,8 +110,7 @@ Task("Push")
     {
         Information($"Processing Push for DevExpress Version: {version}");
 
-        var packageVersion = CalculatePackageVersion(version);
-        var globPattern = $"{artifactsDir}/{packageNamePattern}.{packageVersion}.nupkg";
+        var globPattern = $"{artifactsDir}/*.nupkg";
         var packages = GetFiles(globPattern);
 
         if (!packages.Any())
@@ -153,20 +155,6 @@ bool ShouldUsePrivateFeed(string version)
     return versionSegments.Length == 4;
 }
 
-string CalculatePackageVersion(string version)
-{
-    var versionSegments = version.Split('.');
-    if (versionSegments.Length == 4)
-    {
-        if (int.TryParse(versionSegments[3], out int lastSegment))
-        {
-            int newLastSegment = (lastSegment * 1000) + int.Parse(buildNumber);
-            return $"{versionSegments[0]}.{versionSegments[1]}.{versionSegments[2]}.{newLastSegment}";
-        }
-        throw new InvalidOperationException($"Invalid version format for self-compiled version: {version}");
-    }
-    return $"{version}.{buildNumber}";
-}
 
 (string Source, string ApiKey) GetNuGetSettings(string version)
 {
