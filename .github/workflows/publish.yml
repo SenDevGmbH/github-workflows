@@ -49,8 +49,6 @@ jobs:
       with:
         dotnet-version: ${{ inputs.dotnet-version }}
     - name: Build and Publish
-      env:
-        DevExpress_License: ${{ secrets.DEVEXPRESS_LICENSE }}
       run: >-
         dotnet run .cake-scripts/build.cs --
         --target=Push
@@ -64,3 +62,4 @@ jobs:
         AZURE_NUGET_KEY: ${{ secrets.AZURE_NUGET_KEY }}
         AZURE_NUGET_SOURCE: ${{ secrets.AZURE_NUGET_SOURCE }}
         NUGET_SOURCE: https://api.nuget.org/v3/index.json
+        DevExpress_License: ${{ secrets.DEVEXPRESS_LICENSE }}
