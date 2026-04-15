@@ -28,7 +28,8 @@ on:
         required: false
       AZURE_NUGET_SOURCE:
         required: false
-
+      DEVEXPRESS_LICENSE:
+        required: true
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -47,8 +48,9 @@ jobs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ inputs.dotnet-version }}
-
     - name: Build and Publish
+      env:
+        DevExpress_License: ${{ secrets.DEVEXPRESS_LICENSE }}
       run: >-
         dotnet run .cake-scripts/build.cs --
         --target=Push
