@@ -54,7 +54,7 @@ jobs:
         --target=Push
         --buildNumber=${{ github.run_number }}
         --solutionPath=${{ inputs.solution-path }}
-        --testProjectPath=${{ inputs.test-project-path }}
+        --testProjectPath="${{ inputs.test-project-path }}"
         --dxVersions="${{ vars.DX_VERSIONS }}"
         --packageNamePattern=${{ inputs.package-name-pattern }}
       env:
