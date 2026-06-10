@@ -49,15 +49,25 @@ jobs:
       with:
         dotnet-version: ${{ inputs.dotnet-version }}
     - name: Build and Publish
-      run: >-
-        dotnet run .cake-scripts/build.cs --
-        --target=Push
-        --buildNumber=${{ github.run_number }}
-        --solutionPath=${{ inputs.solution-path }}
-        --testProjectPath="${{ inputs.test-project-path }}"
-        --dxVersions="${{ vars.DX_VERSIONS }}"
-        --packageNamePattern=${{ inputs.package-name-pattern }}
+      run: |
+        args=(
+          "--target=Push"
+          "--buildNumber=${GITHUB_RUN_NUMBER}"
+          "--solutionPath=${SOLUTION_PATH}"
+          "--dxVersions=${DX_VERSIONS}"
+          "--packageNamePattern=${PACKAGE_NAME_PATTERN}"
+        )
+
+        if [[ -n "${TEST_PROJECT_PATH}" ]]; then
+          args+=("--testProjectPath=${TEST_PROJECT_PATH}")
+        fi
+
+        dotnet run .cake-scripts/build.cs -- "${args[@]}"
       env:
+        SOLUTION_PATH: ${{ inputs.solution-path }}
+        TEST_PROJECT_PATH: ${{ inputs.test-project-path }}
+        DX_VERSIONS: ${{ vars.DX_VERSIONS }}
+        PACKAGE_NAME_PATTERN: ${{ inputs.package-name-pattern }}
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         AZURE_NUGET_KEY: ${{ secrets.AZURE_NUGET_KEY }}
         AZURE_NUGET_SOURCE: ${{ secrets.AZURE_NUGET_SOURCE }}
