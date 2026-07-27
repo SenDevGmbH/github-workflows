@@ -50,7 +50,12 @@ Task("Pack")
         var msBuildSettings = new DotNetMSBuildSettings()
             .WithProperty("DevExpressPackageVersion", version)
             .WithProperty("PackageVersion", packageVersion)
-            .WithProperty("AssemblyVersion", packageVersion);
+            .WithProperty("AssemblyVersion", packageVersion)
+            // Source Link: let package consumers step into the source code
+            .WithProperty("ContinuousIntegrationBuild", "true")
+            .WithProperty("PublishRepositoryUrl", "true")
+            .WithProperty("EmbedUntrackedSources", "true")
+            .WithProperty("DebugType", "embedded");
 
         if (ShouldUsePrivateFeed(version))
             msBuildSettings = msBuildSettings.WithProperty("PackageIdSuffix", privatePackageSuffix);

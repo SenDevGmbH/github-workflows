@@ -37,6 +37,17 @@ jobs:
 | `test-project-path` | No | `''` | Path to the test project (leave empty to skip tests) |
 | `dotnet-version` | No | `9.0.x` | .NET SDK version to install |
 
+### Source debugging
+
+Packages are built with [Source Link](https://learn.microsoft.com/dotnet/standard/library-guidance/sourcelink) enabled:
+
+- `ContinuousIntegrationBuild=true` — deterministic builds with normalized source paths
+- `PublishRepositoryUrl=true` — the repository URL is recorded in the package and PDB
+- `EmbedUntrackedSources=true` — generated/untracked source files are embedded in the PDB
+- `DebugType=embedded` — the PDB is embedded in the assembly, so symbols ship inside the package itself and work with any feed (nuget.org and Azure Artifacts alike, no `.snupkg` or symbol server required)
+
+Consumers can step into package source code in Visual Studio or Rider — the debugger fetches the sources from GitHub at the exact commit the package was built from (disable *Just My Code* and keep *Source Link support* enabled).
+
 ### Required Secrets
 
 | Name | Description |
